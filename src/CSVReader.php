@@ -10,7 +10,7 @@ namespace JasBulilit\CSV;
 
 class CSVReader extends AbstractCSV implements \IteratorAggregate {
 
-	const DEFAULT_ITERATOR_CLASS = '\JCSV\CSVIterator';
+	const DEFAULT_ITERATOR_CLASS = '\JasBulilit\CSV\CSVIterator';
 
 	/**
 	 * @var string
