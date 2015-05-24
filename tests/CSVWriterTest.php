@@ -23,6 +23,12 @@ class CSVWriterTest extends \PHPUnit_Framework_TestCase {
 		vfsStream::setup('dummy_dir');
 	}
 
+	/**
+	 * @covers ::append
+	 * @covers ::_getFilePointer
+	 * @covers ::_initFilePointer
+	 * @covers ::close
+	 */
 	public function testAppend() {
 		$file_path = vfsStream::url('dummy_dir/dummy.csv');
 
@@ -43,6 +49,9 @@ class CSVWriterTest extends \PHPUnit_Framework_TestCase {
 		);
 	}
 
+	/**
+	 * @covers ::close
+	 */
 	public function testClose() {
 		$file_path = vfsStream::url('dummy_dir/dummy.csv');
 
@@ -50,11 +59,59 @@ class CSVWriterTest extends \PHPUnit_Framework_TestCase {
 		$writer->close();
 	}
 
+	/**
+	 * @covers ::_initFilePointer
+	 */
+	public function testFailureOnOpenFile() {
+		// fopen時の警告発生を抑制
+		$expected_warning = 'failed to open stream: "NeverOpenStream::stream_open" call failed';
+		$this->_disabledPHPWarning($expected_warning);
+
+		stream_wrapper_register('nos', 'NeverOpenStream');
+		$file_path = 'nos://dummy';
+		$writer = new \JasBulilit\CSV\CSVWriter($file_path);
+
+		$is_catch_exception = false;
+		$dummy_data = $this->_getDummyRows();
+		try {
+			$writer->append($dummy_data[0]);
+		} catch(\RuntimeException $e) {
+			$is_catch_exception = true;
+			$this->assertEquals("Failed to open file: {$file_path}", $e->getMessage());
+		}
+
+		$this->_enabledPHPWarning();
+		$this->assertTrue($is_catch_exception);
+	}
+
 	private function _getDummyRows() {
 		return array(
 			array('あいうえお', 'かきく"けこ', 'さしす,せそ', "たちつてと\r\nなにぬねの"),
 			array('はひふへほ', 'まみむ\めも', 'や""ゆ""よ', 'ら,",り","るれろ', "わ\r\nお\r\nん")
 		);
+	}
+
+	/**
+	 * 予想されるE_WARNINGを無効化
+	 *
+	 * @param string $expected_warning
+	 * @return void
+	 */
+	private function _disabledPHPWarning($expected_warning) {
+		$error_handler = function($errno, $errstr, $errfile, $errline) {
+			if ($errno == E_WARNING
+				&& strpos($errstr, $expected_warning) !== false) {
+				return true;
+			}
+		};
+		set_error_handler($error_handler, E_WARNING);
+	}
+
+	/**
+	 * E_WARNING有効化(エラーハンドラーを復元)
+	 */
+	private function _enabledPHPWarning() {
+		restore_error_handler();
 	}
 }
 
@@ -90,5 +147,14 @@ class EOL_LFToCRLFFilter extends ConvertFilter {
 class EOL_CRLFToLFFilter extends ConvertFilter {
 	protected function _convert($data) {
 		return rtrim($data, "\r\n") . "\n";
+	}
+}
+
+/**
+ * 常にfopenに失敗するstream
+ */
+class NeverOpenStream {
+	public function stream_open($path , $mode , $options , $opened_path) {
+		return false;
 	}
 }
