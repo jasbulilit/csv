@@ -98,7 +98,7 @@ class CSVWriterTest extends \PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	private function _disabledPHPWarning($expected_warning) {
-		$error_handler = function($errno, $errstr, $errfile, $errline) {
+		$error_handler = function($errno, $errstr, $errfile, $errline) use ($expected_warning) {
 			if ($errno == E_WARNING
 				&& strpos($errstr, $expected_warning) !== false) {
 				return true;
