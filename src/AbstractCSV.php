@@ -164,8 +164,7 @@ abstract class AbstractCSV {
 			return;
 		}
 
-		if (! is_subclass_of($filter_class, 'php_user_filter')
-			|| ! stream_filter_register($filter_name, $filter_class)) {
+		if (! $this->_registerStreamFilter($filter_name, $filter_class)) {
 			throw new \RuntimeException("Failed to register stream filter {$filter_class} as {$filter_name}");
 		}
 
@@ -198,5 +197,17 @@ abstract class AbstractCSV {
 		} else {
 			return $file_path;
 		}
+	}
+
+	/**
+	 * @param string $filter_name
+	 * @param string $filter_class
+	 * @return boolean
+	 */
+	private function _registerStreamFilter($filter_name, $filter_class) {
+		if (! is_subclass_of($filter_class, 'php_user_filter')) {
+			return false;
+		}
+		return stream_filter_register($filter_name, $filter_class);
 	}
 }

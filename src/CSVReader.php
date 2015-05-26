@@ -24,13 +24,29 @@ class CSVReader extends AbstractCSV implements \IteratorAggregate {
 	 * @throws \InvalidArgumentException
 	 */
 	public function __construct($csv_path, $context = null, $class_name = self::DEFAULT_ITERATOR_CLASS) {
+		parent::__construct($csv_path, $context);
+
+		$this->setIteratorClass($class_name);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getIteratorClass() {
+		return $this->_iterator_class;
+	}
+
+	/**
+	 * @param string $class_name
+	 * @return void
+	 * @throws \InvalidArgumentException
+	 */
+	public function setIteratorClass($class_name) {
 		if ($class_name != self::DEFAULT_ITERATOR_CLASS
 			&& ! is_subclass_of($class_name, self::DEFAULT_ITERATOR_CLASS)) {
 			throw new \InvalidArgumentException('$class_name must extends ' . self::DEFAULT_ITERATOR_CLASS);
 		}
 		$this->_iterator_class = $class_name;
-
-		parent::__construct($csv_path, $context);
 	}
 
 	/**

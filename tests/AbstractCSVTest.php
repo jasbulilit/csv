@@ -115,6 +115,7 @@ class AbstractCSVTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers ::getFilters
 	 * @covers ::addFilter
+	 * @covers ::_registerStreamFilter
 	 * @runInSeparateProcess
 	 * @dataProvider filterProvider
 	 */
@@ -127,6 +128,7 @@ class AbstractCSVTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers ::addFilter
+	 * @covers ::_registerStreamFilter
 	 * @expectedException \RuntimeException
 	 * @expectedExceptionMessage Filter already exists
 	 * @runInSeparateProcess
@@ -139,6 +141,7 @@ class AbstractCSVTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers ::addFilter
+	 * @covers ::_registerStreamFilter
 	 * @expectedException \RuntimeException
 	 * @expectedExceptionMessage Failed to register stream filter
 	 */

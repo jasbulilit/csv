@@ -31,12 +31,26 @@ class CSVReaderTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers ::__construct
+	 * @covers ::setIteratorClass
 	 * @expectedException \InvalidArgumentException
 	 * @expectedExceptionMessage $class_name must extends
 	 */
 	public function testSetInvalidIterator() {
 		$csv_uri = getDataURI(self::$_dummy_csv);
 		$reader = new \JasBulilit\CSV\CSVReader($csv_uri, null, 'ArrayIterator');
+	}
+
+	/**
+	 * @covers ::setIteratorClass
+	 * @covers ::getIteratorClass
+	 */
+	public function testSetAndGetIterator() {
+		$csv_uri = getDataURI(self::$_dummy_csv);
+		$reader = new \JasBulilit\CSV\CSVReader($csv_uri);
+		$this->assertEquals(\JasBulilit\CSV\CSVReader::DEFAULT_ITERATOR_CLASS, $reader->getIteratorClass());
+
+		$reader->setIteratorClass('DummyCSVIterator');
+		$this->assertEquals('DummyCSVIterator', $reader->getIteratorClass());
 	}
 
 	/**
