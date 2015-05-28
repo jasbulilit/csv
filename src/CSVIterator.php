@@ -40,7 +40,11 @@ class CSVIterator implements \Iterator {
 	 * @return string[]
 	 */
 	public function current() {
-		return $this->_csv->current();
+		$row = $this->_csv->current();
+		if ($this->_isEmpty($row)) {
+			return array();
+		}
+		return $row;
 	}
 
 	/**
@@ -74,5 +78,20 @@ class CSVIterator implements \Iterator {
 	 */
 	public function rewind() {
 		$this->_csv->rewind();
+	}
+
+	/**
+	 * 空行判定
+	 *
+	 * @param String[] $row
+	 * @return boolean
+	 */
+	private function _isEmpty($row) {
+		foreach ($row as $col) {
+			if ($col != '') {
+				return false;
+			}
+		}
+		return true;
 	}
 }
