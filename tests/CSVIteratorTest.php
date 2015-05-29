@@ -65,6 +65,7 @@ class CSVIteratorTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @covers ::current
+	 * @covers ::_isEmpty
 	 */
 	public function testCurrentWithEmptyRow() {
 		$iterator = new \JasBulilit\CSV\CSVIterator(getDataURI(array()));
