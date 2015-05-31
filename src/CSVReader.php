@@ -20,13 +20,12 @@ class CSVReader extends AbstractCSV implements \IteratorAggregate {
 	/**
 	 * @param string $csv_path	filepath
 	 * @param resource|null $context	stream context resource
-	 * @param string $class_name	CSVIterator class name
 	 * @throws \InvalidArgumentException
 	 */
-	public function __construct($csv_path, $context = null, $class_name = self::DEFAULT_ITERATOR_CLASS) {
+	public function __construct($csv_path, $context = null) {
 		parent::__construct($csv_path, $context);
 
-		$this->setIteratorClass($class_name);
+		$this->setIteratorClass(self::DEFAULT_ITERATOR_CLASS);
 	}
 
 	/**

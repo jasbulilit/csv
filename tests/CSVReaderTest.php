@@ -21,10 +21,42 @@ class CSVReaderTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @covers ::__construct
 	 */
+	public function testConstructor() {
+		$csv_uri = getDataURI(self::$_dummy_csv);
+		$reader = new \JasBulilit\CSV\CSVReader($csv_uri);
+		$this->assertEquals($csv_uri, $reader->getCSVPath());
+		$this->assertNull($reader->getContext());
+	}
+
+	/**
+	 * @covers ::__construct
+	 */
+	public function testConstructorWithContext() {
+		$csv_uri = getDataURI(self::$_dummy_csv);
+		$context = stream_context_create();
+		$reader = new \JasBulilit\CSV\CSVReader($csv_uri, $context);
+		$this->assertEquals($context, $reader->getContext());
+	}
+
+	/**
+	 * @expectedException \InvalidArgumentException
+	 */
+	public function testConstructorWithInvalidContext() {
+		$csv_uri = getDataURI(self::$_dummy_csv);
+		$context = array(
+			'Foo'	=> 'bar'
+		);
+		$reader = new \JasBulilit\CSV\CSVReader($csv_uri, $context);
+	}
+
+	/**
+	 * @covers ::setIteratorClass
+	 */
 	public function testSetCSVIterator() {
 		$csv_uri = getDataURI(self::$_dummy_csv);
 		$iterator_class = 'DummyCSVIterator';
-		$reader = new \JasBulilit\CSV\CSVReader($csv_uri, null, $iterator_class);
+		$reader = new \JasBulilit\CSV\CSVReader($csv_uri);
+		$reader->setIteratorClass($iterator_class);
 
 		$this->assertTrue(is_a($reader->getIterator(), $iterator_class));
 	}
@@ -37,7 +69,9 @@ class CSVReaderTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testSetInvalidIterator() {
 		$csv_uri = getDataURI(self::$_dummy_csv);
-		$reader = new \JasBulilit\CSV\CSVReader($csv_uri, null, 'ArrayIterator');
+		$iterator_class = 'ArrayIterator';
+		$reader = new \JasBulilit\CSV\CSVReader($csv_uri);
+		$reader->setIteratorClass($iterator_class);
 	}
 
 	/**
