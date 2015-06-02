@@ -22,4 +22,4 @@ script: phpunit --coverage-clover=coverage.clover
 
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
-  - if [ "$TRAVIS_PHP_VERSION" != "hhvm" || "$TRAVIS_PHP_VERSION" != "5.3.3" ]; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
+  - if [ "$TRAVIS_PHP_VERSION" != "hhvm" && "$TRAVIS_PHP_VERSION" != "5.3.3" ]; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi

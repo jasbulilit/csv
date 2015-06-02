@@ -2,5 +2,7 @@ filter:
   paths: [src/*]
 
 tools:
-  external_code_coverage: true
+  external_code_coverage:
+    timeout: 600
+    runs: 2
   php_code_coverage: true
