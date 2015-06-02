@@ -6,6 +6,7 @@
  * @link	https://github.com/jasbulilit/csv
  * @package	CSV Test
  */
+use JasBulilit\CSV\CSVReader;
 
 /**
  * @coversDefaultClass \JasBulilit\CSV\CSVIterator
@@ -24,18 +25,27 @@ class CSVIteratorTest extends \PHPUnit_Framework_TestCase {
 		"91102	'さしすせそ'	'opqrstu'	3"
 	);
 
+	private $_dummy_csv_uri;
+	private $_reader;
+
+	protected function setUp() {
+		$this->_dummy_csv_uri = getDataURI(self::$_dummy_csv);
+		$this->_reader = new CSVReader($this->_dummy_csv_uri);
+	}
+
 	/**
 	 * @covers ::__construct
 	 */
-	public function testConstructor() {
+	public function testConstructorWithTSV() {
 		$delimiter = '	';
 		$enclosure = "'";
+		$dummy_tsv_uri = getDataURI(self::$_dummy_tsv);
 
-		$iterator = new \JasBulilit\CSV\CSVIterator(
-			getDataURI(self::$_dummy_tsv),
-			$delimiter,
-			$enclosure
-		);
+		$reader = new CSVReader($dummy_tsv_uri);
+		$reader->setDelimiter($delimiter);
+		$reader->setEnclosure($enclosure);
+
+		$iterator = new \JasBulilit\CSV\CSVIterator($dummy_tsv_uri, $reader);
 		foreach (self::$_dummy_tsv as $row) {
 			$this->assertEquals(toCSV($row, $delimiter, $enclosure), $iterator->current());
 			$iterator->next();
@@ -46,9 +56,8 @@ class CSVIteratorTest extends \PHPUnit_Framework_TestCase {
 	 * @covers ::__construct
 	 */
 	public function testConstructorWithContext() {
-		$options['context'] = stream_context_create();
-
-		$iterator = new \JasBulilit\CSV\CSVIterator(getDataURI(self::$_dummy_csv), ',', '"', '\\', $options);
+		$this->_reader->setContext(stream_context_create());
+		$iterator = new \JasBulilit\CSV\CSVIterator($this->_dummy_csv_uri, $this->_reader);
 		foreach (self::$_dummy_csv as $row) {
 			$this->assertEquals(toCSV($row), $iterator->current());
 			$iterator->next();
@@ -59,7 +68,7 @@ class CSVIteratorTest extends \PHPUnit_Framework_TestCase {
 	 * @covers ::current
 	 */
 	public function testCurrent() {
-		$iterator = new \JasBulilit\CSV\CSVIterator(getDataURI(self::$_dummy_csv));
+		$iterator = new \JasBulilit\CSV\CSVIterator($this->_dummy_csv_uri, $this->_reader);
 		$this->assertEquals(toCSV(self::$_dummy_csv[0]), $iterator->current());
 	}
 
@@ -68,7 +77,8 @@ class CSVIteratorTest extends \PHPUnit_Framework_TestCase {
 	 * @covers ::_isEmpty
 	 */
 	public function testCurrentWithEmptyRow() {
-		$iterator = new \JasBulilit\CSV\CSVIterator(getDataURI(array()));
+		$empty_uri = getDataURI(array());
+		$iterator = new \JasBulilit\CSV\CSVIterator($empty_uri, new CSVReader($empty_uri));
 		$this->assertEquals(array(), $iterator->current());
 	}
 
@@ -76,7 +86,7 @@ class CSVIteratorTest extends \PHPUnit_Framework_TestCase {
 	 * @covers ::next
 	 */
 	public function testNext() {
-		$iterator = new \JasBulilit\CSV\CSVIterator(getDataURI(self::$_dummy_csv));
+		$iterator = new \JasBulilit\CSV\CSVIterator($this->_dummy_csv_uri, $this->_reader);
 		foreach (self::$_dummy_csv as $row) {
 			$this->assertEquals(toCSV($row), $iterator->current());
 			$iterator->next();
@@ -87,7 +97,7 @@ class CSVIteratorTest extends \PHPUnit_Framework_TestCase {
 	 * @covers ::key
 	 */
 	public function testKey() {
-		$iterator = new \JasBulilit\CSV\CSVIterator(getDataURI(self::$_dummy_csv));
+		$iterator = new \JasBulilit\CSV\CSVIterator($this->_dummy_csv_uri, $this->_reader);
 		foreach (self::$_dummy_csv as $key => $row) {
 			$this->assertEquals($key, $iterator->key());
 			$iterator->next();
@@ -98,7 +108,7 @@ class CSVIteratorTest extends \PHPUnit_Framework_TestCase {
 	 * @covers ::valid
 	 */
 	public function testValid() {
-		$iterator = new \JasBulilit\CSV\CSVIterator(getDataURI(self::$_dummy_csv));
+		$iterator = new \JasBulilit\CSV\CSVIterator($this->_dummy_csv_uri, $this->_reader);
 		foreach (self::$_dummy_csv as $row) {
 			$this->assertTrue($iterator->valid());
 			$iterator->next();
@@ -110,7 +120,7 @@ class CSVIteratorTest extends \PHPUnit_Framework_TestCase {
 	 * @covers ::rewind
 	 */
 	public function testRewind() {
-		$iterator = new \JasBulilit\CSV\CSVIterator(getDataURI(self::$_dummy_csv));
+		$iterator = new \JasBulilit\CSV\CSVIterator($this->_dummy_csv_uri, $this->_reader);
 
 		$csv = null;
 		foreach (self::$_dummy_csv as $row) {

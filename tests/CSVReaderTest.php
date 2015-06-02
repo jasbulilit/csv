@@ -78,7 +78,7 @@ class CSVReaderTest extends \PHPUnit_Framework_TestCase {
 	 * @covers ::setIteratorClass
 	 * @covers ::getIteratorClass
 	 */
-	public function testSetAndGetIterator() {
+	public function testSetAndGetIteratorClass() {
 		$csv_uri = getDataURI(self::$_dummy_csv);
 		$reader = new \JasBulilit\CSV\CSVReader($csv_uri);
 		$this->assertEquals(\JasBulilit\CSV\CSVReader::DEFAULT_ITERATOR_CLASS, $reader->getIteratorClass());
@@ -95,6 +95,19 @@ class CSVReaderTest extends \PHPUnit_Framework_TestCase {
 		$reader = new \JasBulilit\CSV\CSVReader($csv_uri);
 
 		$this->assertTrue(is_a($reader->getIterator(), '\JasBulilit\CSV\CSVIterator'));
+	}
+
+	/**
+	 * @covers ::setSkipHeaderFlag
+	 * @covers ::getSkipHeaderFlag
+	 */
+	public function testSkipHeaderFlag() {
+		$csv_uri = getDataURI(self::$_dummy_csv);
+		$reader = new \JasBulilit\CSV\CSVReader($csv_uri);
+		$this->assertFalse($reader->getSkipHeaderFlag());
+
+		$reader->setSkipHeaderFlag(true);
+		$this->assertTrue($reader->getSkipHeaderFlag());
 	}
 
 	/**

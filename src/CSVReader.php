@@ -12,6 +12,8 @@ class CSVReader extends AbstractCSV implements \IteratorAggregate {
 
 	const DEFAULT_ITERATOR_CLASS = '\JasBulilit\CSV\CSVIterator';
 
+	private $_is_skip_header = false;
+
 	/**
 	 * @var string
 	 */
@@ -49,20 +51,31 @@ class CSVReader extends AbstractCSV implements \IteratorAggregate {
 	}
 
 	/**
+	 * ヘッダー行のスキップフラグを取得
+	 *
+	 * @return boolean
+	 */
+	public function getSkipHeaderFlag() {
+		return $this->_is_skip_header;
+	}
+
+	/**
+	 * ヘッダー行のスキップフラグを設定
+	 *
+	 * @param boolean $skip_header_flag
+	 */
+	public function setSkipHeaderFlag($skip_header_flag) {
+		$this->_is_skip_header = (boolean) $skip_header_flag;
+	}
+
+	/**
 	 * @see \IteratorAggregate::getIterator()
 	 * @return CSVIterator
 	 */
 	public function getIterator() {
-		$options = array(
-			'context' => $this->getContext()
-		);
-
 		return new $this->_iterator_class(
 			$this->buildUri($this->getCSVPath(), parent::FILTER_CHAIN_READ),
-			$this->delimiter,
-			$this->enclosure,
-			$this->escape,
-			$options
+			$this
 		);
 	}
 }

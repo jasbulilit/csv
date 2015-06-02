@@ -16,27 +16,32 @@ class CSVIterator implements \Iterator {
 	private $_csv;
 
 	/**
-	 * @param string $csv_path	filepath/url(when allow_url_fopen enabled)
-	 * @param string $delimiter
-	 * @param string $enclosure
-	 * @param string $escape
-	 * @param array $options
+	 * @var CSVReader
 	 */
-	public function __construct($csv_path, $delimiter = ',', $enclosure = '"', $escape = '\\', array $options = array()) {
+	private $_reader;
+
+	/**
+	 * @param string $csv_path	filepath/url(when allow_url_fopen enabled)
+	 * @param CSVReader $reader
+	 */
+	public function __construct($csv_path, CSVReader $reader) {
 		$open_mode = 'r';
 		$use_include_path = false;
-		if (isset($options['context'])) {
-			$this->_csv = new \SplFileObject($csv_path, $open_mode, $use_include_path, $options['context']);
+		$context = $reader->getContext();
+		if ($context !== null) {
+			$this->_csv = new \SplFileObject($csv_path, $open_mode, $use_include_path, $context);
 		} else {
 			$this->_csv = new \SplFileObject($csv_path, $open_mode, $use_include_path);
 		}
 
 		$this->_csv->setFlags(\SplFileObject::DROP_NEW_LINE|\SplFileObject::READ_CSV);
-		$this->_csv->setCsvControl($delimiter, $enclosure, $escape);
+		$this->_csv->setCsvControl(
+			$reader->getDelimiter(), $reader->getEnclosure(), $reader->getEscape());
+
+		$this->_reader = $reader;
 	}
 
 	/**
-	 * @see \SplFileObject::current()
 	 * @return string[]
 	 */
 	public function current() {
@@ -78,6 +83,9 @@ class CSVIterator implements \Iterator {
 	 */
 	public function rewind() {
 		$this->_csv->rewind();
+		if ($this->_reader->getSkipHeaderFlag()) {
+			// TODO
+		}
 	}
 
 	/**
