@@ -84,7 +84,8 @@ class CSVIterator implements \Iterator {
 	public function rewind() {
 		$this->_csv->rewind();
 		if ($this->_reader->getSkipHeaderFlag()) {
-			// TODO
+			$this->current();
+			$this->next();
 		}
 	}
 

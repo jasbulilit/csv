@@ -14,6 +14,7 @@ use JasBulilit\CSV\CSVReader;
 class CSVIteratorTest extends \PHPUnit_Framework_TestCase {
 
 	private static $_dummy_csv = array(
+		'ID,五十音,アルファベット,数字',
 		'00001,"あいうえお","abcdefg",1',
 		'01101,"かきくけこ","hijklmn",2',
 		'01102,"さしすせそ","opqrstu",3'
@@ -127,8 +128,33 @@ class CSVIteratorTest extends \PHPUnit_Framework_TestCase {
 			$csv = $iterator->current();
 			$iterator->next();
 		}
-		$this->assertEquals(toCSV(self::$_dummy_csv[2]), $csv, 'brefore rewind');
+		$this->assertEquals(toCSV($row), $csv, 'brefore rewind');
 		$iterator->rewind();
 		$this->assertEquals(toCSV(self::$_dummy_csv[0]), $iterator->current(), 'after rewind');
+	}
+
+	/**
+	 * @covers ::rewind
+	 */
+	public function testRewindWithSkipHeader() {
+		$this->_reader->setSkipHeaderFlag(true);
+		$iterator = new \JasBulilit\CSV\CSVIterator($this->_dummy_csv_uri, $this->_reader);
+
+		$iterator->rewind();
+		$this->assertEquals(toCSV(self::$_dummy_csv[1]), $iterator->current());
+	}
+
+	public function testIteratorWithSkipHeader() {
+		$this->_reader->setSkipHeaderFlag(true);
+		$iterator = new \JasBulilit\CSV\CSVIterator($this->_dummy_csv_uri, $this->_reader);
+
+		$dummy_csv = self::$_dummy_csv;
+		$header = array_shift($dummy_csv);
+
+		$index = 0;
+		foreach ($iterator as $row) {
+			$this->assertEquals(toCSV($dummy_csv[$index]), $row, "index: {$index}");
+			$index++;
+		}
 	}
 }
